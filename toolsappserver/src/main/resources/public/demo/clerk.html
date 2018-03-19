@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <title>Tools4Rent</title>
+
+	<link href="https:///maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+	<link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+    <link href="css/style.css" rel="stylesheet">
+	 
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+    
+    <script type="text/javascript" src="js/toolsapi.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="js/pickup.js"></script>
+    <script type="text/javascript" src="js/dropoff.js"></script>
+    <script type="text/javascript" src="js/addtool.js"></script>
+    <script type="text/javascript" src="js/reports.js"></script>
+
+    <script>
+	
+	    var clerkUsername = window.location.hash.substring(1);
+	    initPickup();
+	    initDropoff();
+	    initAddTool();
+	    initReports();
+
+    </script>
+
+  </head>
+  
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="">Tools4Rent</a>
+        </div>
+		<div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a id="linkPickup" href="#">Pick Up</a></li>
+            <li><a id="linkDropoff"  href="#">Drop Off</a></li>
+            <li><a href="#" data-toggle="modal" data-target="#addNewToolModal">Add New Tool</a></li>
+            <li><a id="linkClerkReport" href="#" data-toggle="modal" data-target="#clerkReportModal">Clerk Report</a></li>
+            <li><a id="linkCustomerReport" href="#" data-toggle="modal" data-target="#customerReportModal">Customer Report</a></li>
+            <li><a id="linkToolReport" href="#" data-toggle="modal" data-target="#toolReportModal">Tool Inventory Report</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">        
+            <li><a href="login.html">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+		
+    <section>
+	    <div class="container">
+	        <div class="row">
+																	          
+	          	<div class="col-md-9" id="showResult">
+	            	<img src="img/Hardware-Tools.jpg" alt="Hardware Tools">
+	            	
+			        <div class="col-md-9" id="pickupReservation" style="visibility: hidden">
+						<h2 class="page-header">Pick-Up Reservation</h2>
+						<table id="pickupReservationTable" class="table table-striped table-bordered">
+					        <thead>
+					            <tr>
+					                <th>Reservation ID</th>
+					                <th>Customer</th>
+					                <th>Customer ID</th>
+					                <th>Start Date</th>
+					                <th>End Date</th>
+					            </tr>
+					        </thead>
+					        <tbody>
+					        </tbody>
+					    </table>
+											    
+			            <div>
+			                <label>Enter the reservation number: </label>
+			                <input type="text" class="form-control" id="pickupReservationIdTextInput"></input>		            	
+			            </div>
+			            <button type="button" class="btn btn-primary" id="pickupBtn" data-toggle="modal" data-target="#pickupConfModal">Pick Up</button> 
+					    
+			        </div> <!-- pickupReservation -->
+
+			        <div class="col-md-9" id="dropoffReservation" style="visibility: hidden">
+						<h2 class="page-header">Dropoff Reservation</h2>
+						<table id="dropoffReservationTable" class="table table-striped table-bordered">
+					        <thead>
+					            <tr>
+					                <th>Reservation ID</th>
+					                <th>Customer</th>
+					                <th>Customer ID</th>
+					                <th>Start Date</th>
+					                <th>End Date</th>
+					            </tr>
+					        </thead>
+					        <tbody>
+					        </tbody>
+					    </table>
+											    
+			            <div>
+			                <label>Enter the reservation number: </label>
+			                <input type="text" class="form-control" id="dropoffReservationIdTextInput"></input>		            	
+			            </div>
+			            <button type="button" class="btn btn-primary" id="dropoffBtn" data-toggle="modal" data-target="#dropoffConfModal">Drop Off</button> 
+					    
+			        </div> <!-- dropoff Reservation -->
+
+	          	</div>	<!-- showResult -->
+	          				
+	        </div>	<!-- row -->
+	    </div> <!-- container -->						
+    </section>
+    
+    <!-- Pick Up Confirmation Modal -->
+    <div class="modal fade" id="pickupConfModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Pickup Reservation</h4>
+	      </div>
+          <div class="modal-body">
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="pickupConfModalLabelReservationId"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="pickupConfModalLabelCustomerName"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="pickupConfModalLabeTotalDeposit"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="pickupConfModalLabelTotalRentalPrice"></label>
+				</div>
+	      	</div>
+          </div>
+		  <div class="modal-footer">
+	      	<button type="button" class="btn btn-default" id="pickupConfModalConfirmBtn" data-dismiss="modal">Confirm Pickup</button>
+	 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		  </div>
+        </div>
+      </div>
+    </div>    
+    
+    <!-- Drop Off Confirmation Modal -->
+    <div class="modal fade" id="dropoffConfModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Dropoff Reservation</h4>
+	      </div>
+          <div class="modal-body">
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="dropoffConfModalLabelReservationId"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="dropoffConfModalLabelCustomerName"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="dropoffConfModalLabeTotalDeposit"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="dropoffConfModalLabelTotalRentalPrice"></label>
+				</div>
+	      	</div>
+          </div>
+		  <div class="modal-footer">
+	      	<button type="button" class="btn btn-default" id="dropoffConfModalConfirmBtn" data-dismiss="modal">Dropoff</button>
+	 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		  </div>
+        </div>
+      </div>
+    </div>    
+    
+	<!-- Reservation Modal -->
+	<div id="reservationModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+	
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 id="reservationModalId" class="modal-title"></h4>
+	      </div>
+	      <div class="modal-body" id="reservationModalBody">
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="reservationModalCustomerName"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="reservationModalCustomerId"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+	          		<label id="reservationModalTotalDeposit"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+	          		<label id="reservationModalTotalRentalPrice"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+	          		<label>Tool Name:</label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12" id ='reservationModalTools'></div>			
+			</div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	
+	  </div>
+	</div>    
+    
+    <!-- Add New Tool Modal -->
+    <div class="modal fade" id="addNewToolModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Add New Tool</h4>
+          </div>
+          <div class="modal-body">
+			<h2>Add Tool</h2>
+			<div class="row">
+			  <div class="col-sm-1">
+		          <label>Type: </label>
+			  </div>
+			  <div class="col-sm-3">
+		          <label><input type="radio" name="toolType" value="hand">Hand Tool</label>
+			  </div>
+			  <div class="col-sm-3">
+		          <label><input type="radio" name="toolType" value="garden">Garden Tool</label>
+			  </div>
+			  <div class="col-sm-2">
+		          <label><input type="radio" name="toolType" value="ladder">Ladder</label>
+			  </div>
+			  <div class="col-sm-3">
+		          <label><input type="radio" name="toolType" value="power">Power Tool</label>
+			  </div>
+			</div>
+			<div class="row">
+			  <div class="col-sm-6">
+		          <label>Sub-Type: </label>
+                  <select id="toolSubTypeDropdown"></select>
+			  </div>
+			  <div class="col-sm-6">
+		          <label>Sub-Option</label>
+                  <select id="toolSubOptionDropdown"/></select>
+			  </div>			
+			</div>
+			<div class="row">
+			  <div class="col-sm-6">
+                <label>Purchase Price</label>
+                <input type="text" id="toolPurchasePrice"></input>
+			  </div>
+			  <div class="col-sm-6">
+                <label>Manufacturer</label>
+                <input type="text" id="toolManufacturer"></input>
+			  </div>			
+			</div>
+			<div class="row">
+			  <div class="col-sm-12">
+                <label>Width (inches)</label>
+                <input type="text" id="toolWidth"></input>
+			  </div>
+			</div>
+			<div class="row">
+			  <div class="col-sm-12">
+                <label>Length (inches)</label>
+                <input type="text" id="toolLength"></input>
+			  </div>
+			</div>
+			<div class="row">
+			  <div class="col-sm-12">
+                <label>Material</label>
+                <input type="text" id="toolMaterial"></input>
+			  </div>
+			</div>
+			<div class="row" id="addToolAdditionalFields"></div>
+			<div class="row">
+			  <div class="col-sm-12">
+                <label>PowerSource</label>
+				<select id="toolPowerSourceDropdown">
+					<option value="manual">Manual</option>
+					<option value="electric">Electric</option>
+					<option value="cordless">Cordless</option>
+					<option value="gas">Gas</option>
+				</select>
+			  </div>
+			</div>
+			<div class="row" id="addToolPowerToolSection1" style="visibility: hidden">
+	   		  <h2>Power Tools Only</h2>
+			  <div class="col-sm-6">
+                <label>Amp Rating</label>
+                <input type="text" id="ampRating"></input>
+			  </div>
+			  <div class="col-sm-6">
+                <label>Volt Rating</label>
+                <input type="text" id="voltRating"></input>
+			  </div>
+			</div>		
+			<div class="row" id="addToolPowerToolSection2" style="visibility: hidden">				  
+			  <div class="col-sm-6">
+                <label>Speed Max (RPM)</label>
+                <input type="text" id="maxRpmRating"></input>
+			  </div>
+			  <div class="col-sm-6">
+                <label>Speed Min (RPM)</label>
+                <input type="text" id="minRpmRating"></input>
+			  </div>
+			</div>
+			<div class="row" id="addToolPowerToolSection3" style="visibility: hidden">	
+			  <div class="col-sm-8" id="addToolAccessorySection">
+				<div class="row">
+				  <div class="col-sm-4">
+	                <label>Accessory Quantity</label>
+	                <input type="text" id="accessoryQuantity"></input>
+				  </div>
+				  <div class="col-sm-4">
+	                <label>Accessory Description</label>
+	                <input type="text" id="accessoryDescription"></input>
+				  </div>
+				</div>			  
+			  </div>
+			  <div class="col-sm-4">
+                <button type="button" class="btn btn-default" id="btnAddAccessory">Add Accessory</button>
+			  </div>
+			</div>			
+			<div class="row" id="addToolCordlessToolSection" style="visibility: hidden">
+			  <h2>Cordless Tools Only</h2>
+			  <div class="col-sm-4">
+                <label>Battery Type</label>
+				<select id="toolBatteryTypeDropdown">
+					<option value="Li-Ion">Li-Ion</option>
+					<option value="NiCd">NiCd</option>
+					<option value="NiMH">NiMH</option>
+				</select>
+			  </div>
+			  <div class="col-sm-4">
+                <label>D/C Volt Rating</label>
+                <input type="text" id="batteryVoltRating"></input>
+			  </div>
+			  <div class="col-sm-4">
+                <label>Quantity</label>
+                <input type="text" id="batteryQuantity"></input>
+			  </div>
+			</div>
+			<br>
+			<div class="modal-footer">
+                <button type="button" class="btn btn-default" id="btnAddTool" data-dismiss="modal">Confirm</button>
+  				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+			</div>
+          </div>	
+        </div>
+      </div>
+    </div>
+    
+    <!-- Clerk Report Modal -->
+    <div class="modal fade" id="clerkReportModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document"  style="width: 1080px">
+        <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Clerk Report</h4>
+	      </div>
+          <div class="modal-body">
+	        <b>The list of clerks where their total pickups and dropoffs are shown for the past month.</b>
+			<div class="row">
+				<div class="col-lg-12">
+					<table id="clerkReportTable" class="table table-striped table-bordered">
+				        <thead>
+				            <tr>
+				                <th>Clerk ID</th>
+				                <th>First Name</th>
+				                <th>Middle Name</th>
+				                <th>Last Name</th>
+				                <th>Email</th>
+				                <th>Hire Date</th>
+				                <th>Number of Pickups</th>
+				                <th>Number of Dropoffs</th>
+				                <th>Combined Total</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				        </tbody>
+				    </table>
+				</div>
+	      	</div>      	
+          </div>
+		  <div class="modal-footer">
+	 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		  </div>
+        </div>
+      </div>
+    </div>        
+    
+    <!-- Customer Report Modal -->
+    <div class="modal fade" id="customerReportModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document"  style="width: 1080px">
+        <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Customer Report</h4>
+	      </div>
+          <div class="modal-body">
+	        <b>The list of customers and reservations with tools for the last month.</b>
+			<div class="row">
+				<div class="col-lg-12">
+					<table id="customerReportTable" class="table table-striped table-bordered">
+				        <thead>
+				            <tr>
+				                <th>Customer ID</th>
+				                <th>First Name</th>
+				                <th>Middle Name</th>
+				                <th>Last Name</th>
+				                <th>Email</th>
+				                <th>Phone</th>
+				                <th>Total # Reservations</th>
+				                <th>Total # Tools Rented</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				        </tbody>
+				    </table>
+				</div>
+	      	</div>      	
+          </div>
+		  <div class="modal-footer">
+	 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		  </div>
+        </div>
+      </div>
+    </div>        
+
+    <!-- Tool Report Modal -->
+    <div class="modal fade" id="toolReportModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document"  style="width: 1080px">
+        <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Tool Inventory Report</h4>
+	      </div>
+          <div class="modal-body">
+	        <b>The list of tools where their total profit and cost are shown for all time.</b>
+			<div class="row">
+				<div class="col-lg-12">
+					<table id="toolReportTable" class="table table-striped table-bordered">
+				        <thead>
+				            <tr>
+				                <th>Tool ID</th>
+				                <th>Description</th>
+				                <th>Rental Profit</th>
+				                <th>Total Cost</th>
+				                <th>Total Profit</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				        </tbody>
+				    </table>
+				</div>
+	      	</div>      	
+          </div>
+		  <div class="modal-footer">
+	 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		  </div>
+        </div>
+      </div>
+    </div>        
+    
+
+  </body>
+</html>

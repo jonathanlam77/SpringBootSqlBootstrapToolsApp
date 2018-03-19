@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<script>
+
+function randomVal(n)
+{
+	var max = Math.pow(10, n);
+	return Math.floor(Math.random() * max);
+}
+
+window.onload = function()
+{
+	var customerUsername = window.location.hash.substring(1);
+	document.getElementById('username').value = customerUsername;
+	
+	document.getElementById('home_phone_number').value = randomVal(7);
+	document.getElementById('work_phone_number').value = randomVal(7);
+	document.getElementById('cell_phone_number').value = randomVal(7);
+	document.getElementById('card_number').value = randomVal(16);
+}
+
+function validateUserName() 
+{
+  var usertype = 'customer'
+  var username = document.getElementById('username').value;
+  
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function()
+  {
+	if (this.readyState == 4) 
+    {
+    	console.log(this.responseText);
+        switch(this.status)
+        {
+          case 200:
+          		document.getElementById('warning').innerHTML = username + ' already exists, please choose another one.';
+          		document.getElementById('username').value = '';
+          		break;
+          case 404:		
+          		document.getElementById('warning').innerHTML = username + ' is OK to use.';
+          		break;
+          default:
+          		console.log("Unknown state happened: " + this.status);
+        } 	
+	}
+  }
+  
+  xhttp.open('GET', 'http://localhost:8080/'+usertype+'/'+username, true);
+  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhttp.send();
+  console.log("Query username: "+username);
+}
+
+function validatePassword()
+{ 
+	if (document.getElementById('password').value != document.getElementById('password_retype').value)
+	{
+		document.getElementById('password').value = '';
+		document.getElementById('password_retype').value = '';	
+		document.getElementById('pwd_warning').innerHTML = 'Password does not match, try again!';	
+	}
+	else
+		document.getElementById('pwd_warning').innerHTML = '';
+}
+
+function validateCardNumber()
+{
+	var card_num = document.getElementById('card_number').value;
+	if (card_num < 1000000000000000 || card_num >= 10000000000000000)
+	{
+		document.getElementById('card_number').value = 'Null';
+		document.getElementById('card_number').placeholder = 'Invalid Card Number!';
+	}
+}
+
+function validateCardCVC()
+{
+	var card_num = document.getElementById('card_cvc').value;
+	if (card_num >= 10000)
+	{
+		document.getElementById('card_cvc').value = 'Null';
+		document.getElementById('card_cvc').placeholder = 'Invalid CVC Number!';
+	}
+}
+
+function validateCardYear()
+{
+	var card_num = document.getElementById('card_year').value;
+	if (card_num >= 2030 || card_num < 1980)
+	{
+		document.getElementById('card_year').value = 'Null';
+		document.getElementById('card_year').placeholder = 'Invalid Year!';
+	}
+}
+
+function register()
+{
+   var data = {};
+      
+   //record all the form values
+   rform = document.getElementById('form');
+   for (var i = 0; i < rform.length; i ++){
+   		if (rform.elements[i].value)
+   			data[rform.elements[i].id] = rform.elements[i].value;
+   }
+   
+   delete data.password_retype;
+   
+   delete data.home_phone_code;
+   delete data.home_phone_number;
+   delete data.main_phone_0;
+   
+   delete data.work_phone_code;
+   delete data.work_phone_number;
+   delete data.main_phone_1;
+   
+   delete data.cell_phone_code;
+   delete data.cell_phone_number;
+   delete data.main_phone_2;
+   
+   delete data.card_number;
+   delete data.card_name;
+   delete data.card_month;
+   delete data.card_year;
+   delete data.card_cvc;
+      
+   var phone0 = {};
+   phone0['areaCode'] = document.getElementById('home_phone_code').value;
+   phone0['number'] = document.getElementById('home_phone_number').value;
+   phone0['extension'] = 0;
+   if (document.getElementById('main_phone_0').checked)
+   		phone0['primary'] = true;
+   else
+   		phone0['primary'] = false;
+   
+   data['home'] = phone0;
+     
+   var phone1 = {};
+   phone1['areaCode'] = document.getElementById('work_phone_code').value;
+   phone1['number'] = document.getElementById('work_phone_number').value;
+   phone1['extension'] = 0;
+   if (document.getElementById('main_phone_1').checked)
+   		phone1['primary'] = true;
+   else
+   		phone1['primary'] = false;
+   
+   data['work'] = phone1; 
+   
+   var phone2 = {};
+   phone2['areaCode'] = document.getElementById('cell_phone_code').value;
+   phone2['number'] = document.getElementById('cell_phone_number').value;
+   phone2['extension'] = 0;
+   if (document.getElementById('main_phone_2').checked)
+   		phone2['primary'] = true;
+   else
+   		phone2['primary'] = false;
+   
+   data['cell'] = phone2;
+   
+   var creditCard = {};
+   creditCard['number'] = document.getElementById('card_number').value;
+   creditCard['name'] = document.getElementById('card_name').value;
+   creditCard['month'] = document.getElementById('card_month').value;
+   creditCard['year'] = document.getElementById('card_year').value;
+   creditCard['cvc'] = document.getElementById('card_cvc').value;
+   data["creditCard"] = creditCard;
+   
+   window.current_user = data;
+   
+   var xhttp = new XMLHttpRequest();
+   xhttp.onreadystatechange = function(){
+  	console.log("XHTTP state = " + this.readyState + ", status = " + this.status);
+  	console.log(this.responseText);
+	console.log('User created successfully!')
+	//localStorage.setItem('login', 'y');
+	//localStorage.setItem('current_user', JSON.stringify(window.current_user));
+	if (this.readyState == 4)
+	{
+	}
+	
+    if(xhttp.status === 201) {
+		window.location.href = 'customer.html' + '#' + document.getElementById('username').value;
+    }
+	
+   }
+   
+   var sData = "data=" + JSON.stringify(data);
+   xhttp.open("POST", "http://localhost:8080/customer/", true);
+   xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+   xhttp.send(sData);
+   
+   console.log('String sent: ' + sData);
+}
+
+function backLogin()
+{
+	window.location.href = 'login.html';
+}
+</script>
+
+<form class="form-horizontal" id='form' onsubmit='register()'>
+
+<fieldset>
+<!-- Form Name -->
+<legend>Customer Information</legend>
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="username"></label>  
+  <div class="col-md-4">
+  <input id="username" name="username" type="text" placeholder="User Name" class="form-control input-md" required="">
+  <p id='warning'></p>
+  </div>
+</div>
+<!-- Password input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="password"></label>
+  <div class="col-md-4">
+  <p>Password:	<input id="password" name="password" type="password" placeholder="Password" class="form-control input-md" required="" value='12321'>
+  </p>  
+  <p>Re-type:	<input id="password_retype" name="password_retype" type="password" placeholder="Retype Password" class="form-control input-md" required="" value='12321' onchange='validatePassword()'>
+  </p>	
+  <p id='pwd_warning'></p>
+  </div>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Contact</legend>
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="first_name"></label>  
+  <div class="col-md-4">
+  <p>Name:
+  <input id="firstName" name="firstName" type="text" placeholder="First Name" class="form-control input-md" required="" value='rick'>
+  <input id="midName" name="midName" type="text" placeholder="Middle Name" class="form-control input-md" value=''>
+  <input id="lastName" name="lastName" type="text" placeholder="Last Name" class="form-control input-md" required="" value='shu'>    
+  </p>
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="home_phone"></label>  
+  <div class="col-md-2">
+  <p>Home Phone
+  <input id="home_phone_code" name="home_phone_code" type="number" placeholder="Home Area Code" class="form-control input-md" value='404'>
+  <input id="home_phone_number" name="home_phone_number" type="number" placeholder="Home Number" class="form-control input-md">  
+  </p>
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="work_phone"></label>  
+  <div class="col-md-4">
+  <p>Work Phone
+  <input id="work_phone_code" name="work_phone_code" type="number" placeholder="Work Area Code" class="form-control input-md" value='678'>
+  <input id="work_phone_number" name="work_phone_number" type="number" placeholder="Work Number" class="form-control input-md" >
+  </p>
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="cell_phone"></label>  
+  <div class="col-md-4">
+  <p>Cell Phone
+  <input id="cell_phone_code" name="cell_phone_code" type="number" placeholder="Cell Area Code" class="form-control input-md" value='206'>
+  <input id="cell_phone_number" name="cell_phone_number" type="number" placeholder="Cell Number" class="form-control input-md">
+  </p>
+  </div>
+</div>
+
+<!-- Multiple Radios (inline) -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="main_phone"></label>
+  <div class="col-md-4"> 
+    <label class="radio-inline" for="main_phone-0">
+      <input type="radio" name="main_phone" id="main_phone_0" value="0" checked="checked">
+      Home
+    </label> 
+    <label class="radio-inline" for="main_phone-1">
+      <input type="radio" name="main_phone" id="main_phone_1" value="1">
+      Work
+    </label> 
+    <label class="radio-inline" for="main_phone-2">
+      <input type="radio" name="main_phone" id="main_phone_2" value="2">
+      Cell
+    </label>
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="email"></label>  
+  <div class="col-md-4">
+  <p>Email
+  <input id="email" name="email" type="text" placeholder="Email" class="form-control input-md" required="" value='haha@gatech.edu'>
+  </p>
+  </div>
+</div>
+
+<!-- Text input-->
+<p>Address
+<div class="form-group">
+  <label class="col-md-4 control-label" for="street"></label>  
+  <div class="col-md-4">
+  
+  <input id="street" name="street" type="text" placeholder="Street" class="form-control input-md" required="" value='1087 11th Street Apt 1'>
+  <input id="city" name="city" type="text" placeholder="City" class="form-control input-md" required="" value='Atlanta'>
+  </div>
+</div>
+ 
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="zip"></label>  
+  <div class="col-md-4">
+   <select name="state" id='state'>
+    <option value="AL">AL</option>
+    <option value="AK">AK</option>
+    <option value="AS">AS</option>
+    <option value="AZ">AZ</option>
+    <option value="AR">AR</option>
+    <option value="CA">CA</option>
+    <option value="CO">CO</option>
+    <option value="CT">CT</option>
+    <option value="GA">GA</option>
+  </select>
+  <input id="zip" name="zip" type="text" placeholder="Zip Code" class="form-control input-md" required="" value='30332'>    
+  </div>
+</div>
+</p>
+
+</fieldset>
+
+<fieldset>
+<legend>Credit Card Information</legend>
+<div class="form-group">
+  <label class="col-md-4 control-label" for="zip"></label>  
+  <p>Card Number
+  <input id="card_number" name="Credit Card Number" type="number" placeholder="Credit card number" class="form-control input-md" onchange='validateCardNumber()'>
+  </p>
+  <p>Name of Card Holder
+  <input id="card_name" name="Card Holder Name" type="text" placeholder="Card hodler name" class="form-control input-md" value='Rick Shu'>
+  </p>
+  <p>Expiration Date
+  <select id='card_month' name="card_month" >
+    <option value=1>JAN</option>
+    <option value=2>FEB</option>
+    <option value=3>MAR</option>
+    <option value=4>APR</option>
+    <option value=5>MAY</option>
+    <option value=6>JUN</option>
+    <option value=7>JUL</option>
+    <option value=8>AUG</option>
+    <option value=9>SEP</option>
+    <option value=10>OCT</option>
+    <option value=11>NOV</option>
+    <option value=12>DEC</option>
+  </select>
+  <input id="card_year" name="Exp. Year" type="number" placeholder="Year" class="form-control input-md" value=2019 onchange='validateCardYear()'>
+  </p>
+  <p>CVC Code
+  <input id="card_cvc" name="CVC" type="number" placeholder="CVC" class="form-control input-md" value=123 onchange='validateCardCVC()'>
+  </p>
+</div>
+</fieldset>
+<input type="submit">
+<button type="button" id='login' onclick='backLogin()'>Back to login</button>
+</form>
+
+</body>
+</html>
+
+

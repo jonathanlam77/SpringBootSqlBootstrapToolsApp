@@ -1,0 +1,19 @@
+
+PREREQUISITES
+	1. - Java installed.  I'm running Java 8.
+	2. - MySql Server installed and running locally at localhost:3306 with a user created with the following
+		credentials:
+			username = root
+			password = pw
+
+BUILDING THE SERVER
+	1. Install maven
+	2. In /toolsappserver/ do a "mvn clean package".
+
+STARTING THE SERVER
+	- In the /Phase 3/toolsappserver/target folder execute the following command:
+		java -jar toolsappserver-1.0.0.jar
+
+TESTING THE SERVER
+	- See /Phase 3/toolsappserver/docs/test.txt
+

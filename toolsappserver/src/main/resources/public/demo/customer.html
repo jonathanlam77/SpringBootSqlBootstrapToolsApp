@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <title>Tools4Rent</title>
+
+	<link href="https:///maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+	<link href="https://cdn.datatables.net/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet"/>
+	<link href="https://cdn.datatables.net/select/1.2.3/css/select.dataTables.min.css" rel="stylesheet"/>
+
+    <link href="css/style.css" rel="stylesheet">
+	 
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap.min.js"></script>
+	
+    <script type="text/javascript" src="js/toolsapi.js"></script>
+    <script type="text/javascript" src="js/common.js"></script>
+    <script type="text/javascript" src="js/viewprofile.js"></script>
+    <script type="text/javascript" src="js/reservation.js"></script>
+
+    <script>
+	
+	    var customerUsername = window.location.hash.substring(1);
+	    initViewProfile();
+	    initReservations();
+
+    </script>
+    
+  </head>
+  
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="">Tools4Rent</a>
+        </div>
+		<div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a id="linkViewProfile" href="#" data-toggle="modal" data-target="#viewProfileModal">View Profile</a></li>
+            <li><a id="linkCheckToolAvail"  href="#">Check Tool Availability</a></li>
+            <li><a id="linkMakeReservation" href="#">Make Reservation</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">        
+            <li><a href="login.html">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    
+    <section>
+	    <div class="container">
+	        <div class="row">
+																	          
+	          	<div class="col-md-9" id="showResult">
+	            	<img src="img/Hardware-Tools.jpg" alt="Hardware Tools">
+	            	
+			        <div class="col-md-9" id="searchReservation" style="visibility: hidden">
+						<h2>Search</h2>
+						<div class="row">
+						  <div class="col-sm-4">
+			                <label>Start Date</label>
+			                <input type="text" id="searchStartDate" placeholder="YYYY-MM-DD"></input>
+						  </div>
+						  <div class="col-sm-4">
+			                <label>End Date</label>
+			                <input type="text" id="searchEndDate" placeholder="YYYY-MM-DD"></input>
+						  </div>			
+						  <div class="col-sm-6">
+			                <label>Custom Search</label>
+			                <input type="text" id="searchSubOption"></input>
+						  </div>			
+						</div>
+						
+						<div class="row">
+						  <div class="col-sm-1">
+					          <label>Type: </label>
+						  </div>
+						  <div class="col-sm-3">
+					          <label><input type="radio" name="toolType" value="hand">Hand Tool</label>
+						  </div>
+						  <div class="col-sm-3">
+					          <label><input type="radio" name="toolType" value="garden">Garden Tool</label>
+						  </div>
+						  <div class="col-sm-2">
+					          <label><input type="radio" name="toolType" value="ladder">Ladder</label>
+						  </div>
+						  <div class="col-sm-3">
+					          <label><input type="radio" name="toolType" value="power">Power Tool</label>
+						  </div>
+						</div>
+						<div class="row">
+						  <div class="col-sm-6">
+					          <label>Sub-Type: </label>
+			                  <select id="toolSubTypeDropdown"></select>
+						  </div>
+						  <div class="col-sm-6">
+			                  <label>PowerSource</label>
+							  <select id="toolPowerSourceDropdown">
+								<option value="manual">Manual</option>
+								<option value="electric">Electric</option>
+								<option value="cordless">Cordless</option>
+								<option value="gas">Gas</option>
+							  </select>
+						  </div>			
+						</div>
+						<div class="row">
+						  <div class="col-sm-12">
+						  </div>
+						</div>
+						<div class="row">
+						  <div class="col-sm-12">
+               				 <button type="button" class="btn btn-default" id="btnSearch">Search</button>
+						  </div>
+						</div>
+						<div class="row">
+					        <div class="col-md-9" id="availToolsForRent">
+								<h2 class="page-header">Available Tools For Rent</h2>
+								<table id="availToolsForRentTable" class="table table-striped table-bordered">
+							        <thead>
+							            <tr>
+									        <th></th>
+							                <th>Tool ID</th>
+							                <th>Description</th>
+							                <th>Rental Price</th>
+							                <th>Deposit Price</th>
+							            </tr>
+							        </thead>
+							        <tbody>
+							        </tbody>
+							    </table>
+					        </div>
+			        	</div>
+			        </div>
+
+			        <div class="col-md-9" id="toolsAddedToReservation" style="visibility: hidden">
+              			<button type="button" class="btn btn-default" id="btnAddToolToReservation">Add Tool To Reservation</button>
+						<h2 class="page-header">Tools Added to Reservation</h2>
+						<table id="addedToolsTable" class="table table-striped table-bordered">
+					        <thead>
+					            <tr>
+					                <th>Tool ID</th>
+					                <th>Description</th>
+					                <th>Rental Price</th>
+					                <th>Deposit Price</th>
+					            </tr>
+					        </thead>
+					        <tbody>
+					        </tbody>
+					    </table>
+              				<button type="button" class="btn btn-default" id="btnCalcTotal" data-toggle="modal" data-target="#reservationConfirmationModal">Calculate Total</button>
+			        </div>
+
+	          	</div>	<!-- showResult -->
+	          				
+	        </div>	<!-- row -->
+	    </div> <!-- container -->						
+    </section>    
+    
+    <!-- View Profile Modal -->
+    <div class="modal fade" id="viewProfileModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document"  style="width: 1080px">
+        <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">View Profile</h4>
+	      </div>
+          <div class="modal-body">
+	        <h2>Customer Info</h2>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="viewProfileModalEmail"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="viewProfileModalFullName"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="viewProfileModalHomePhone"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="viewProfileModalWorkPhone"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="viewProfileModalCellPhone"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="viewProfileModalAddress"></label>
+				</div>
+	      	</div>      	
+	        <h2>Reservations</h2>	      	
+			<div class="row">
+				<div class="col-lg-12">
+					<table id="viewProfileReservationTable" class="table table-striped table-bordered">
+				        <thead>
+				            <tr>
+				                <th>Reservation ID</th>
+				                <th>Tools</th>
+				                <th>Start Date</th>
+				                <th>End Date</th>
+				                <th>Pickup Clerk</th>
+				                <th>Dropoff Clerk</th>
+				                <th>Number of Days</th>
+				                <th>Total Deposit Price</th>
+				                <th>Total Rental Price</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				        </tbody>
+				    </table>
+				</div>
+	      	</div>      	
+          </div>
+		  <div class="modal-footer">
+	 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		  </div>
+        </div>
+      </div>
+    </div>        
+    
+    <!-- Reserve Tool Confirmation Modal -->    
+    <div class="modal fade" id="reservationConfirmationModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document"  style="width: 1080px">
+        <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Reservation</h4>
+	      </div>
+          <div class="modal-body">
+	        <h2>Reservation Summary</h2>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="reservationConfirmationModalReservationDates"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="reservationConfirmationModalNumberDays"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="reservationConfirmationModalTotalDepositPrice"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="reservationConfirmationModalTotalRentalPrice"></label>
+				</div>
+	      	</div>
+	        <h2>Tools</h2>	      	
+			<div class="row">
+				<div class="col-lg-12">
+					<table id="reservationConfirmationToolsTable" class="table table-striped table-bordered">
+				        <thead>
+				            <tr>
+				                <th>Tool ID</th>
+				                <th>Description</th>
+				                <th>Deposit Price</th>
+				                <th>Rental Price</th>
+				            </tr>
+				        </thead>
+				        <tbody>
+				        </tbody>
+				    </table>
+				</div>
+	      	</div>      	
+          </div>
+		  <div class="modal-footer">
+	 		<button type="button" class="btn btn-default" id="btnReserveTools">Submit</button>
+	 		<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+		  </div>
+        </div>
+      </div>
+    </div>        
+    
+	<!-- Additional Tool Details -->
+	<div id="additionalToolDetailsModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+	
+	    <!-- Modal content-->
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Tool Details</h4>
+	      </div>
+	      <div class="modal-body" id="additionalToolDetailsModalBody">
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="additionalToolDetailsModalToolId"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+		          	<label id="additionalToolDetailsModalToolType"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+	          		<label id="additionalToolDetailsModalShortDesc"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+	          		<label id="additionalToolDetailsModalFullDesc"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+	          		<label id="additionalToolDetailsModalDepositPrice"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+	          		<label id="additionalToolDetailsModalRentalPrice"></label>
+				</div>
+	      	</div>
+			<div class="row">
+				<div class="col-lg-12">
+	          		<label id="additionalToolDetailsModalAccessories"></label>
+				</div>
+	      	</div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	      </div>
+	    </div>
+	  </div>
+	 </div>    
+    </div>
+    
+  </body>
+</html>
+    

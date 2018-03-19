@@ -1,0 +1,185 @@
+GET CUSTOMER/PASSWORD/CREDITCARD
+
+	curl -X GET 'localhost:8080/customer/jlam21' -i
+		HTTP/1.1 200
+		{"username":"jlam10","email":"d@gmail.com","password":"123","firstName":"jon","midName":"null","lastName":"lam","cell":{"phoneNumberId":6135917708,"areaCode":613,"number":5917708,"extension":0,"primary":false},"home":null,"work":null,"street":"100 forest rd","city":"toronto","state":"on","zip":"90210","creditCard":{"number":1199888877776666,"name":"123","month":1,"year":1977,"cvc":123}}
+
+ADD CUSTOMER
+
+	curl -i -X POST 'localhost:8080/customer/' -d 'data={"username":"jlam21","email":"rick@gmail.com","password":"123abc","firstName":"jon","midName":"dave","lastName":"lam","home":{"areaCode":555,"number":3788888,"extension":0,"primary":false},"cell":null,"work":null,"street":"100 forest rd","city":"toronto","state":"on","zip":"90210","creditCard":{"number":2369888877776665,"name":"myccname","month":12,"year":1985,"cvc":123}}'
+		HTTP/1.1 201
+
+CUSTOMER REPORT
+
+	curl -i -X GET 'localhost:8080/customer/report'
+		[{"customer":{"username":"jlam1","email":"rick@gmail.com","password":"123abc","firstName":"jon","midName":"dave","lastName":"lam","cell":null,"home":{"phoneNumberId":9053788888,"areaCode":905,"number":3788888,"extension":0,"primary":true},"work":null,"street":"100 forest rd","city":"toronto","state":"on","zip":"90210","creditCard":{"number":5019888177776666,"name":"jon","month":1,"year":1977,"cvc":123}},"totalReservations":1,"totalToolsRented":1}]
+
+GET CLERK/GET PASSWORD
+
+	curl -X GET 'localhost:8080/clerk/c1'
+		{"username":"c1","email":"j@gmail.com","password":"jl","firstName":"jon","midName":null,"lastName":"lam","hireDate":"2017-01-30","employeeNumber":"123"}
+
+ADD CLERK
+
+	curl -i -X POST 'localhost:8080/clerk/' -d 'data={"username":"clerk1","email":"j@gmail.com","password":"jl","firstName":"jon","midName":null,"lastName":"lam","dateOfHire":"2017-03-30","employeeNumber":"123"}'
+		HTTP/1.1 201
+
+CLERK REPORT
+
+	curl -i -X GET 'localhost:8080/clerk/report'
+		[{"clerk":{"username":"c2","email":"j@gmail.com","password":"jl","firstName":"jon","midName":null,"lastName":"lam","employeeNumber":"123","dateOfHire":"2017-03-30"},"numPickups":1,"numDropoffs":0,"total":1}]
+
+GET CREDITCARD
+
+	curl -X GET 'localhost:8080/creditcard/1099888877776666' -i
+		HTTP/1.1 200
+		{"number":1099888877776666,"name":"123","month":1,"year":1977,"cvc":123}
+
+ADD CREDITCARD
+
+	curl -i -X POST 'localhost:8080/creditcard/' -d 'data={"number":1099888877776666,"name":"123","month":1,"year":1977,"cvc":123}'
+		HTTP/1.1 201
+
+UPDATE CREDITCARD
+	curl -i -X POST 'localhost:8080/creditcard/update/' -d 'customer=jlam1&reservationId=1&creditcard={"number":2019888177776666,"name":"jon","month":1,"year":1977,"cvc":123}'
+
+ADD PHONE NUMBER
+
+	curl -i -X POST 'localhost:8080/phonenumber/' -d 'number=2581234&areacode=613&isPrimary=1'
+
+GET PHONE NUMBER
+
+    curl -X GET 'localhost:8080/phonenumber/6135917708'
+		{"phoneNumberId":6135917708,"areaCode":613,"number":5917708,"extension":0,"primary":false}
+
+    curl -X GET 'localhost:8080/phonenumber/?number=5917708&areacode=613&extension=0'
+		{"phoneNumberId":6135917708,"areaCode":613,"number":5917708,"extension":0,"primary":false}
+
+RESERVE TOOLS
+
+	curl -i -X POST 'localhost:8080/reservation/tool/' -d 'data={"reservation":{"customer":"jlam21","pickupClerk":null,"dropoffClerk":null,"creditCardNumber":1099888877776666,"startDate":"2017-02-01","endDate":"2017-02-10"}, "toolIDs":[1]}'
+		HTTP/1.1 201
+
+SEARCH AVAILABLE TOOLS FOR RENT
+
+    curl -X GET 'localhost:8080/tool/?type=PowerTool&subType=saw&subOptionKeyword=jig&powerSource=electric&startDate=2017-02-02'
+    curl -X GET 'localhost:8080/tool/?type=PowerTool&subType=saw&subOptionKeyword=jig&powerSource=electric&startDate=2017-02-02&endDate=2017-02-09'
+		[{"toolNumber":1,"reservationId":0,"type":"PowerTool","subType":"Saw","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic"}]
+
+GET RESERVATION
+
+	curl -X GET 'localhost:8080/reservation/1'
+		{"reservationId":1,"customer":"jlam10","pickupClerk":null,"dropoffClerk":null,"creditCardNumber":1099888877776666,"startDate":"2017-01-01","endDate":"2017-01-03"}
+
+GET RESERVATION WITH TOOLS
+
+	GET ALL RESERVATIONS/TOOLS FROM A GIVEN A CUSTOMER
+
+		curl -i -X GET 'localhost:8080/reservation/tool/?customer=jlam1'
+			[{"reservation":{"reservationId":4,"customer":"jlam1","pickupClerk":"clerk1","dropoffClerk":null,"creditCardNumber":1099888877776666,"startDate":"2017-05-01","endDate":"2017-05-01"},"toolIDs":null,"tools":[{"toolNumber":4,"type":"manual","subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood"},{"toolNumber":4,"type":"manual","subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood"}]},{"reservation":{"reservationId":5,"customer":"jlam1","pickupClerk":"c2","dropoffClerk":null,"creditCardNumber":1099888877776666,"startDate":"2017-11-11","endDate":"2018-11-13"},"toolIDs":null,"tools":[{"toolNumber":5,"type":"manual","subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood"}]}]
+
+	GET ALL TOOLS THAT NEED TO BE PICKED UP
+
+		curl -i -X GET 'localhost:8080/reservation/tool/?pickup=true'
+			[{"reservation":{"reservationId":1,"customer":"jlam21","pickupClerk":null,"dropoffClerk":null,"creditCardNumber":1099888877776666,"startDate":"2017-02-01","endDate":"2017-02-10"},"toolIDs":null,"tools":[{"toolNumber":1,"type":"PowerTool","subType":"Saw","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic"}]}]
+
+	GET ALL TOOLS THAT HAVE BEEN PICKED UP AND NEED TO BE DROPPED OFF
+
+		curl -i -X GET 'localhost:8080/reservation/tool/?dropoff=true'
+
+PICKUP RESERVATION
+
+	curl -i -X POST 'localhost:8080/reservation/{reservation_id}/pickupclerk/{clerk}'
+	curl -i -X POST 'localhost:8080/reservation/1/pickupclerk/clerk1'
+
+DROPOFF RESERVATION
+
+	curl -i -X POST 'localhost:8080/reservation/{reservation_id}/dropoffclerk/{clerk}'
+	curl -i -X POST 'localhost:8080/reservation/1/dropoffclerk/clerk1'
+
+TOOL REPORT
+
+	curl -i -X GET 'localhost:8080/tool/report'
+		[{"tool":{"toolNumber":1,"type":"PowerTool","subType":"Saw","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"toolNumber":0,"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"toolNumber":1,"description":"abc","quantity":4},{"toolNumber":1,"description":"axc","quantity":2}],"bladeSize":15.5},"rentalProfit":27.54,"totalCost":20.4,"totalProfit":7.14,"available":true},{"tool":{"toolNumber":2,"type":"manual","subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood","screwSize":7.69},"rentalProfit":149.17,"totalCost":110.5,"totalProfit":38.67,"available":true},{"tool":{"toolNumber":3,"type":"manual","subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood","screwSize":7.69},"rentalProfit":0.0,"totalCost":110.5,"totalProfit":-110.5,"available":true},{"tool":{"toolNumber":4,"type":"manual","subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood","screwSize":7.69},"rentalProfit":165932.32,"totalCost":110.5,"totalProfit":165711.32,"available":true},{"tool":{"toolNumber":5,"type":"manual","subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood","screwSize":7.69},"rentalProfit":0.0,"totalCost":110.5,"totalProfit":-110.5,"available":true},{"tool":{"toolNumber":6,"type":"manual","subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood","screwSize":7.69},"rentalProfit":149.17,"totalCost":110.5,"totalProfit":38.67,"available":true}]
+
+GET TOOL
+
+	curl -X GET 'localhost:8080/tool/19'
+		{"toolNumber":11,"type":"electric","subType":"Saw","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"toolNumber":0,"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"toolNumber":11,"description":"my test accessory","quantity":4},{"toolNumber":11,"description":"ta","quantity":1}],"bladeSize":15.5}
+
+	curl -X GET 'localhost:8080/tool/19' -i
+		{"toolNumber":1,"type":"PowerTool","subType":"Saw","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"toolNumber":0,"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"toolNumber":1,"description":"abc","quantity":4},{"toolNumber":1,"description":"axc","quantity":2}],"bladeSize":15.5}
+
+ADD SAW
+
+	curl -i -X POST 'localhost:8080/tool/saw/' -d 'data={"type":"PowerTool", "subType":"Saw","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"description":"abc","quantity":4},{"description":"axc","quantity":2}],"bladeSize":15.5}'
+		HTTP/1.1 201
+		{"toolNumber":1,"type":"PowerTool","subType":"Saw","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"toolNumber":1,"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"toolNumber":0,"description":"abc","quantity":4},{"toolNumber":0,"description":"axc","quantity":2}],"bladeSize":15.5}
+
+ADD Drill
+
+	curl -i -X POST 'localhost:8080/tool/drill/' -d 'data={"type":"PowerTool", "subType":"Drill","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"description":"abc","quantity":4},{"description":"axc","quantity":2}], "adjustableClutch":true, "minTorqueRating":1, "maxTorqueRating":10}'
+		HTTP/1.1 201
+
+ADD Sander
+
+	curl -i -X POST 'localhost:8080/tool/sander/' -d 'data={"type":"PowerTool", "subType":"Sander","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"description":"abc","quantity":4},{"description":"axc","quantity":2}], "dustBag":true}'
+		HTTP/1.1 201
+
+ADD AirCompressor
+
+	curl -i -X POST 'localhost:8080/tool/aircompressor/' -d 'data={"type":"PowerTool", "subType":"Air-Compressor","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"description":"abc","quantity":4},{"description":"axc","quantity":2}],"tankSize": 6, "pressureRating":100}'
+		HTTP/1.1 201
+
+ADD Mixer
+
+	curl -i -X POST 'localhost:8080/tool/mixer/' -d 'data={"type":"PowerTool", "subType":"Mixer","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"description":"abc","quantity":4},{"description":"axc","quantity":2}],"motorRating":9, "drumSize":9.9}'
+		HTTP/1.1 201
+
+ADD Generator
+
+	curl -i -X POST 'localhost:8080/tool/generator/' -d 'data={"type":"PowerTool", "subType":"Generator","subOption":"jig","purchasePrice":20.4,"powerSource":"electric","widthDiameter":16.0,"length":10.0,"manufacturer":"rona","material":"plastic","ampRating":50.0,"voltRating":5.0,"maxRpmRating":4,"minRpmRating":5,"battery":{"batteryType":"LiIo","voltRating":99.0,"quantity":3},"accessories":[{"description":"abc","quantity":4},{"description":"axc","quantity":2}],"powerRating":7.8}'
+		HTTP/1.1 201
+
+ADD SCREWDRIVER
+
+	curl -i -X POST 'localhost:8080/tool/screwdriver/' -d 'data={"type":"Hand", "subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood","screwSize":7.69}'
+		HTTP/1.1 201
+		{"toolNumber":2,"type":"Hand","subType":"Screwdriver","subOption":"hand","purchasePrice":110.5,"powerSource":"manual","widthDiameter":15.65,"length":1.23,"manufacturer":"dwalt","material":"wood","screwSize":7.69}
+
+ADD STEPLADDER
+	curl -i -X POST 'localhost:8080/tool/stepladder/' -d 'data={"type":"Ladder","subType":"Step","subOption":"folding","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel","stepCount":4,"weightCapacity":10,"pailShelf":true}'
+
+ADD Straightladder
+	curl -i -X POST 'localhost:8080/tool/straightladder/' -d 'data={"type":"Ladder","subType":"Straight","subOption":"rigid","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel","stepCount":4,"weightCapacity":10,"rubberFeet":true}'
+
+ADD Digger
+	curl -i -X POST 'localhost:8080/tool/digger/' -d 'data={"type":"Garden","subType":"Digger","subOption":"edger","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "handleMaterial":"wood", "bladeWidth": 5.0, "bladeLength": 6.0}'
+
+ADD Pruner
+	curl -i -X POST 'localhost:8080/tool/pruner/' -d 'data={"type":"Garden","subType":"Pruner","subOption":"sheer","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "handleMaterial":"wood", "bladeMaterial": "leather", "bladeLength": 6.0}'
+
+ADD Rake
+	curl -i -X POST 'localhost:8080/tool/rake/' -d 'data={"type":"Garden","subType":"Rake","subOption":"leaf","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "handleMaterial":"wood", "tineCount": 6}'
+
+ADD Wheelbarrow
+	curl -i -X POST 'localhost:8080/tool/wheelbarrow/' -d 'data={"type":"Garden","subType":"Wheelbarrow","subOption":"1-wheel","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "handleMaterial":"wood", "binVolume": 6.0, "binMaterial": "plastic", "wheelCount":1}'
+
+ADD Striking
+	curl -i -X POST 'localhost:8080/tool/striking/' -d 'data={"type":"Garden","subType":"Striking","subOption":"tamper","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "handleMaterial":"wood", "headWeight": 6.0}'
+
+ADD Socket
+	curl -i -X POST 'localhost:8080/tool/socket/' -d 'data={"type":"Hand","subType":"Socket","subOption":"deep","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "driveSize":1.5}'
+
+ADD Ratchet
+	curl -i -X POST 'localhost:8080/tool/ratchet/' -d 'data={"type":"Hand","subType":"Ratchet","subOption":"fixed","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "saeSize":5.6, "deepSocket": false, "driveSize": 1.1}'
+
+ADD Pliers
+	curl -i -X POST 'localhost:8080/tool/pliers/' -d 'data={"type":"Hand","subType":"Pliers","subOption":"cutting","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "adjustable":true}'
+
+ADD Gun
+	curl -i -X POST 'localhost:8080/tool/gun/' -d 'data={"type":"Hand","subType":"Gun","subOption":"nail","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "capacity":50, "gaugeRating":7.7}'
+
+ADD Hammer
+	curl -i -X POST 'localhost:8080/tool/hammer/' -d 'data={"type":"Hand","subType":"Hammer","subOption":"claw","purchasePrice":100.0,"powerSource":"manual","widthDiameter":1.0,"length":5.0,"manufacturer":"sdfsd","material":"steel", "antiVibration":true}'
+
